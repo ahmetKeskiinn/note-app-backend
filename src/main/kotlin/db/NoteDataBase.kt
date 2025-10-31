@@ -6,6 +6,7 @@ import com.util.checkHasForPassword
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
+import org.litote.kmongo.setValue
 
 class NoteDataBase : NoteDataAccessObject {
 
@@ -19,8 +20,6 @@ class NoteDataBase : NoteDataAccessObject {
     }
 
     override suspend fun checkPasswordForEmail(email: String, password: String): Boolean {
-        println(email)
-        println(users.findOne(User::email eq email)?.password)
         val actualPassword = users.findOne(User::email eq email)?.password ?: return false
         return checkHasForPassword(password, actualPassword)
     }
@@ -28,20 +27,31 @@ class NoteDataBase : NoteDataAccessObject {
     override suspend fun checkEmailIfExist(email: String): Boolean {
         return users.findOne(User::email eq email) != null
     }
-/*
-    override suspend fun getNotes(): List<Note> {
-
-    }
 
     override suspend fun insertNote(note: Note): Boolean {
+        return notes.insertOne(note).wasAcknowledged()
+    }
 
+    override suspend fun getUserIdWithEmail(email: String): String {
+        return users.findOne(User::email eq email)?.userId ?: ""
+    }
+
+    override suspend fun getNotes(userId: String): List<Note> {
+        return notes.find(Note::owner eq userId).toList()
     }
 
     override suspend fun updateNote(note: Note): Boolean {
-
+        notes.updateOneById(note.id, setValue(Note::title, note.title))
+        notes.updateOneById(note.id, setValue(Note::text, note.text))
+        return notes.updateOneById(note.id, setValue(Note::timestamp, System.currentTimeMillis())).wasAcknowledged()
     }
 
     override suspend fun deleteNote(noteId: String): Boolean {
+        return notes.deleteOneById(noteId).wasAcknowledged()
+    }
 
-    }*/
+    override suspend fun isNoteOwnedBy(userId: String, noteId: String): Boolean {
+        return notes.findOneById(noteId)?.owner == userId
+    }
+
 }

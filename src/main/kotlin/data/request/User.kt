@@ -8,5 +8,5 @@ data class User(
     val email: String,
     val password: String,
     @BsonId
-    val id: String = ObjectId().toString()
+    val userId: String = ObjectId().toString()
 )
