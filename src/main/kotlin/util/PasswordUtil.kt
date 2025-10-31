@@ -16,6 +16,6 @@ fun getHashWithSalt(stringToHash: String, saltLength: Int = 2): String {
     val salt = SecureRandom.getInstance("SHA1PRNG")
         .generateSeed(saltLength)
     val saltAsHex = Hex.encodeHexString(salt)
-    val hash = DigestUtils.sha256Hex("$saltAsHex:$stringToHash")
+    val hash = DigestUtils.sha256Hex("$saltAsHex$stringToHash")
     return "$saltAsHex:$hash"
 }

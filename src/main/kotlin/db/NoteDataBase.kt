@@ -19,6 +19,8 @@ class NoteDataBase : NoteDataAccessObject {
     }
 
     override suspend fun checkPasswordForEmail(email: String, password: String): Boolean {
+        println(email)
+        println(users.findOne(User::email eq email)?.password)
         val actualPassword = users.findOne(User::email eq email)?.password ?: return false
         return checkHasForPassword(password, actualPassword)
     }

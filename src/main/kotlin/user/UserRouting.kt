@@ -1,5 +1,6 @@
 package com.user
 
+import com.data.request.LoginRequest
 import com.data.request.User
 import com.data.request.UserRegisterRequest
 import com.dataBase
@@ -32,6 +33,7 @@ fun Route.userRoutes() {
                 return@post
             }
             val hashPassword = getHashWithSalt(userRegisterRequest.password)
+            println(hashPassword)
             if (dataBase.register(
                     User(
                         userName = userRegisterRequest.userName,
@@ -45,6 +47,26 @@ fun Route.userRoutes() {
                 call.respond(HttpStatusCode.InternalServerError)
                 return@post
             }
+        }
+    }
+    route("/login") {
+        post {
+            val loginRequest = try {
+                call.receive<LoginRequest>()
+            } catch (e: ContentTransformationException) {
+                call.respond(HttpStatusCode.BadRequest, e.toString())
+                return@post
+            }
+            if (!dataBase.checkEmailIfExist(loginRequest.email)) {
+                call.respond(HttpStatusCode.Unauthorized)
+                return@post
+            }
+            print(dataBase.checkPasswordForEmail(loginRequest.email, loginRequest.password))
+            if (dataBase.checkPasswordForEmail(loginRequest.email, loginRequest.password)) {
+                call.respond(HttpStatusCode.OK)
+                return@post
+            }
+            call.respond(HttpStatusCode.Unauthorized)
         }
     }
 }

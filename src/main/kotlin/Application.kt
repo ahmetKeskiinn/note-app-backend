@@ -22,7 +22,7 @@ fun Application.module() {
 
     install(DefaultHeaders)
     install(CallLogging) {
-        level = Level.INFO
+        level = Level.TRACE
     }
     install(ContentNegotiation) {
         gson {
